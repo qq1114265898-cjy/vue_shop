@@ -32,7 +32,7 @@
           </template>
         </el-table-column>
         <!-- 删改操作 -->
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200px">
           <template slot-scope="scope">
             <!-- 修改 -->
             <el-button
@@ -50,8 +50,13 @@
             ></el-button>
             <!-- 文字提示 -->
             <el-tooltip content="分配角色" placement="top" effect="dark" :enterable="false">
-              <!-- 分配权限 -->
-              <el-button size="mini" type="warning" icon="el-icon-setting"></el-button>
+              <!-- 分配角色 -->
+              <el-button
+                size="mini"
+                type="warning"
+                icon="el-icon-setting"
+                @click="showSetCharcterDialog(scope.row)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -126,6 +131,33 @@
           <el-button type="primary" @click="editFormSubmit">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 分配角色对话框 -->
+      <el-dialog
+        title="分配角色"
+        :visible.sync="setCharcterDialogVisble"
+        width="60%"
+        @close="CloseSetRoleDialog"
+      >
+        <span>
+          <p>当前的用户:{{userInfo.username}}</p>
+          <p>当前的角色:{{userInfo.role_name}}</p>
+          <p>
+            分配新角色
+            <el-select v-model="selectedRole" placeholder="请选择角色">
+              <el-option
+                v-for="item in rolesList"
+                :label="item.roleName"
+                :key="item.id"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </p>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setCharcterDialogVisble = false">取 消</el-button>
+          <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -162,6 +194,13 @@ export default {
       // 对话框的默认值
       dialogVisible: false,
       editDialogVisible: false,
+      setCharcterDialogVisble: false,
+      // 当前操作行的用户数据
+      userInfo: {},
+      // 可供选择的角色列表
+      rolesList: {},
+      // 已选择的角色
+      selectedRole: '',
       // 添加用户表单的绑定对象
       addForm: {
         userName: '',
@@ -338,6 +377,41 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    // 展示分配角色对话框
+    showSetCharcterDialog(userInfo) {
+      this.$http.get('roles').then(res => {
+        console.log(res)
+        if (res.data.meta.status !== 200) {
+          return this.$message.error(res.data.meta.msg)
+        }
+        this.rolesList = res.data.data
+        console.log(this.rolesList)
+      })
+      this.userInfo = userInfo
+      console.log(userInfo)
+      this.setCharcterDialogVisble = true
+    },
+    // 点击按钮,分配角色
+    saveRoleInfo() {
+      if (!this.selectedRole) return this.$message.error('请选择要分配的角色')
+      this.$http
+        .put(`users/${this.userInfo.id}/role`, {
+          rid: this.selectedRole
+        })
+        .then(res => {
+          console.log(res)
+          if (res.data.meta.status !== 200) {
+            return this.$message.error(res.data.meta.msg)
+          }
+          this.$message.success(res.data.meta.msg)
+          this.getUserData()
+          this.setCharcterDialogVisble = false
+        })
+    },
+    // 关闭分配角色对话框事件
+    CloseSetRoleDialog() {
+      this.selectedRole = ''
     }
   }
 }
