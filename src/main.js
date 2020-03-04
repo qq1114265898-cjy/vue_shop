@@ -21,3 +21,12 @@ new Vue({
   router,
   render: h => h(App)
 }).$mount('#app')
+
+class Person {
+  constructor() {
+    this.a = 1
+  }
+}
+const dif = new Person()
+console.log(Person.prototype)
+console.log(dif)
