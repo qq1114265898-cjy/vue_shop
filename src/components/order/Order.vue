@@ -31,7 +31,7 @@
         <el-table-column label="下单时间" width="160px">
           <template slot-scope="scope">{{scope.row.create_time | dateFormat}}</template>
         </el-table-column>
-        <el-table-column label="操作" width="160px">
+        <el-table-column label="操作" width="180px">
           <template>
             <el-button type="primary" icon="el-icon-edit" @click="editDialogVisible = true"></el-button>
             <el-button type="success" icon="el-icon-location" @click="showProgressBox"></el-button>
@@ -65,8 +65,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer">
-        <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editDialogVisible = false">确 定</el-button>
+        <el-button size="small" @click="editDialogVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="editDialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
     <!-- 物流信息对话框 -->
